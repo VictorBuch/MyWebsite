@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Victor Buch - Engaging listeners with binaural audiobooks</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript
+      ><link rel="stylesheet" href="assets/css/noscript.css"
+    /></noscript>
+  </head>
+  <body class="is-preload">
+    <!-- Header -->
+    <header id="header">
+      <a href="index.html" class="title">Victor Buch</a>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#one" class="active">My Work</a></li>
+          <li><a href="index.html#two">My SKills</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <section id="main" class="wrapper">
+        <div class="inner">
+          <h1 class="major">Engaging listeners with binaural audiobooks</h1>
+
+          <!-- <span class="image fit"
+            ><img src="images/creation_design.png" alt=""
+          /></span> -->
+          <iframe
+            class="youtube_vid"
+            width="100%"
+            height="720"
+            src="https://www.youtube.com/embed/FnzeOeauAY8"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+
+          <p>
+            Despite their recent popularity, next to no audiobooks utilise
+            binaural audio (3D audio in essence), leaving the story no more
+            immersive than that of a regular book. Therefore this project
+            implemented a binaural audiobook creation tool. This tool allows
+            creators to make binaural audio with the use of the visual spatial
+            circles. It is as simple as pressing record and then putting the red
+            cirle where you want the audio to come from.
+          </p>
+          <h3>Technical details</h3>
+          <p>
+            It was found that in natural spatial hearing, interaural and dynamic
+            cues are used for directional location. To implement the interaural
+            cues, sound has to be either recorded using a dummy head or by
+            modifying the audio using the impulse responses from such a head.
+            Pre-made HRIR's (Head Related Impulse Responses) made it possible to
+            synthesise binaural audio. A gyroscope made it possible to move the
+            binaural audio around the listeners head, to simulate the dynamic
+            cue. This project was a 5th semester university project from AAU
+            which was praised by the examiner and censor.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

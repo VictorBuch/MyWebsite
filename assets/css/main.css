@@ -3090,12 +3090,16 @@ body.is-ie .spotlights > section {
 }
 
 .spotlights > section > .image {
-    background-position: center center;
-    background-size: cover;
+    background-position: center center !important;
+    background-size: contain;
+    background-repeat: no-repeat;
     border-radius: 0;
     display: block;
     position: relative;
     width: 25em;
+}
+.spotlights > section > .image.scale {
+    scale: 0.9;
 }
 
 .spotlights > section > .image img {
@@ -3103,7 +3107,7 @@ body.is-ie .spotlights > section {
     display: block;
 }
 
-.spotlights > section > .image:before {
+/* .spotlights > section > .image:before {
     -moz-transition: opacity 1s ease;
     -webkit-transition: opacity 1s ease;
     -ms-transition: opacity 1s ease;
@@ -3117,7 +3121,7 @@ body.is-ie .spotlights > section {
     position: absolute;
     top: 0;
     width: 100%;
-}
+} */
 
 .spotlights > section > .content {
     padding: 4em 5em 2em 5em;

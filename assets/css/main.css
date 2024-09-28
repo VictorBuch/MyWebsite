@@ -3202,6 +3202,9 @@ body.is-preload .spotlights > section > .content > .inner {
         -ms-transform: translateY(1em);
         transform: translateY(1em);
     }
+    section#two{
+        display:none;
+    }
 }
 
 @media screen and (max-width: 736px) {

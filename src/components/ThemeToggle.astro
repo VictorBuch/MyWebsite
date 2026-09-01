@@ -1,0 +1,86 @@
+---
+/** Three-state theme control: system → light → dark → system. */
+---
+
+<button type="button" class="theme" data-theme-toggle aria-live="polite">
+  <span class="theme__dot" aria-hidden="true"></span>
+  <span class="theme__label" data-theme-label>System</span>
+</button>
+
+<style>
+  .theme {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .theme:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  .theme__dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--paper) 50%, var(--ink) 50%);
+    border: 1px solid var(--line-strong);
+  }
+</style>
+
+<script>
+  type Mode = 'system' | 'light' | 'dark';
+  const order: Mode[] = ['system', 'light', 'dark'];
+
+  function read(): Mode {
+    try {
+      const v = localStorage.getItem('theme');
+      return v === 'light' || v === 'dark' ? v : 'system';
+    } catch {
+      return 'system';
+    }
+  }
+
+  function write(mode: Mode) {
+    try {
+      if (mode === 'system') localStorage.removeItem('theme');
+      else localStorage.setItem('theme', mode);
+    } catch {
+      /* storage unavailable — the choice simply does not persist */
+    }
+  }
+
+  function paint(mode: Mode, label: HTMLElement | null) {
+    if (mode === 'system') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = mode;
+    if (label) label.textContent = mode[0].toUpperCase() + mode.slice(1);
+  }
+
+  function wire() {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+      if (btn.dataset.wired) return;
+      btn.dataset.wired = '1';
+      const label = btn.querySelector<HTMLElement>('[data-theme-label]');
+      paint(read(), label);
+      btn.addEventListener('click', () => {
+        const next = order[(order.indexOf(read()) + 1) % order.length];
+        write(next);
+        paint(next, label);
+      });
+    });
+  }
+
+  wire();
+  document.addEventListener('astro:page-load', wire);
+</script>

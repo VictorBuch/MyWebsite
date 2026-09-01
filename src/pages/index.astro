@@ -1,0 +1,288 @@
+---
+/**
+ * Home. Structure: "front-loaded proof" — the hero is a band rather than a
+ * screen, the strongest project takes the fold, skills fold into About, and
+ * only the experience timeline pins. Chosen over an index-spread and a
+ * single-column dossier; both measured longer or quieter.
+ */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import KineticType from '../components/KineticType.astro';
+import Timeline from '../components/Timeline.astro';
+import { site } from '../data/site';
+import balances from '../assets/work/wannashare/06-overview-01-balances-tab.png';
+import timelineShot from '../assets/work/wannashare/04-timeline-02-with-messages.png';
+import split from '../assets/work/wannashare/05-expense-06-custom-split-percentage.png';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const [feature, ...rest] = projects;
+const timeline = (await getCollection('timeline')).sort((a, b) => a.data.order - b.data.order);
+const experiments = (await getCollection('playground')).sort((a, b) => a.data.order - b.data.order);
+const shots = [balances, timelineShot, split];
+---
+
+<Base>
+  <!-- Hero band: one third of the screen, then straight into the work. -->
+  <section class="section band" data-ground="paper" data-settle data-repel>
+    <div class="rail band__inner">
+      <div class="band__id">
+        <KineticType
+          as="h1"
+          class="band__name"
+          lines={['Victor Buch']}
+          label={`${site.name}, ${site.role.toLowerCase()} in ${site.location}`}
+        />
+        <p class="band__role">{site.role} · {site.location}</p>
+      </div>
+      <p class="band__line">
+        Interfaces that stay fast and readable — finished with motion that means
+        something.
+      </p>
+      <dl class="band__facts">
+        <div><dt class="label">Now</dt><dd>Frontend at Ventrata</dd></div>
+        <div><dt class="label">Local</dt><dd class="tabular" data-clock={site.timezone}>--:--</dd></div>
+        <div><dt class="label">Also runs</dt><dd>Own Linux, network &amp; forge</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- The feature: one project gets the weight it earned. -->
+  <section class="section feature" id="work" data-ground="ink">
+    <div class="rail" data-reveal-group>
+      <p class="label feature__eyebrow" data-reveal>Selected work — 01 of 03</p>
+      <div class="feature__grid">
+        <div class="feature__copy">
+          <h2 class="feature__title" data-reveal>{feature.data.title}</h2>
+          <p class="feature__tagline" data-reveal>{feature.data.tagline}</p>
+          <p class="feature__body" data-reveal>{feature.data.outcome}</p>
+          <ul class="chips" role="list" data-reveal>
+            {feature.data.stack.map((s) => <li>{s}</li>)}
+          </ul>
+          <p data-reveal>
+            <a class="cta" href={`/work/${feature.id}/`} data-target data-magnet="0.2">
+              Read the case study →
+            </a>
+          </p>
+        </div>
+        <ul class="feature__shots" role="list" data-reveal>
+          {
+            shots.map((shot, i) => (
+              <li class={`feature__shot feature__shot--${i}`}>
+                <Image src={shot} alt="" widths={[220, 320]} sizes="30vw" loading={i === 0 ? 'eager' : 'lazy'} />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- The other two, compact and side by side. -->
+  <section class="section" data-ground="paper">
+    <div class="rail">
+      <h2 class="label label--head" data-reveal>Also built</h2>
+      <ul class="pair" role="list" data-reveal-group>
+        {
+          rest.map((project, i) => (
+            <li class="pair__item" data-accent={project.data.accent}>
+              <a href={`/work/${project.id}/`} data-target data-magnet="0.1" data-reveal>
+                <p class="label pair__n">
+                  {String(i + 2).padStart(2, '0')}
+                  {project.data.placeholder && <span class="pair__draft"> · draft</span>}
+                </p>
+                <h3 class="pair__title">{project.data.title}</h3>
+                <p class="pair__tagline">{project.data.tagline}</p>
+                <ul class="chips" role="list">{project.data.stack.slice(0, 4).map((s) => <li>{s}</li>)}</ul>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- About and skills as one block: who I am, then what I do with it. -->
+  <section class="section" id="about" data-ground="ink">
+    <div class="rail about" data-reveal-group>
+      <div class="about__left">
+        <p class="about__plate" aria-hidden="true">VB</p>
+        <p class="label">Portrait — pending</p>
+      </div>
+      <div class="about__right">
+        <h2 class="h2" data-reveal>Frontend, and the machine under it</h2>
+        <div class="prose" data-reveal>{site.bio.map((p) => <p>{p}</p>)}</div>
+        <div class="skills" id="skills" data-reveal>
+          {
+            site.skills.map((group) => (
+              <div class="skills__group">
+                <h3 class="skills__title">{group.group}</h3>
+                <p class="skills__items">{group.items.join(' · ')}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Timeline entries={timeline.map((e) => e.data)} />
+
+  <!-- Playground as a plain grid: one pinned track per page is enough. -->
+  <section class="section" id="playground" data-ground="paper">
+    <div class="rail">
+      <p class="label" data-reveal>Playground</p>
+      <h2 class="h2" data-reveal>Ninety-nine days of one animation a day</h2>
+      <ul class="pens" role="list" data-reveal-group>
+        {
+          experiments.map((pen) => (
+            <li data-reveal>
+              <a href={pen.data.href} data-target rel="noopener">
+                <p class="label">{pen.data.tech}</p>
+                <h3 class="pens__title">{pen.data.title}</h3>
+                <p class="pens__blurb">{pen.data.blurb}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact" data-ground="buttercup">
+    <div class="rail" data-reveal-group>
+      <p class="label" data-reveal>Contact</p>
+      <h2 class="contact__title" data-reveal>Let's build something that moves well.</h2>
+      <p data-reveal><a class="cta cta--dark" href={`mailto:${site.email}`} data-target data-magnet="0.28">{site.email}</a></p>
+      <ul class="socials" role="list" data-reveal>
+        {site.socials.map((s) => <li><a href={s.href} data-target rel="me noopener">{s.label} ↗</a></li>)}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .h2 { font-size: var(--step-3); font-variation-settings: "wght" 700, "wdth" 88; }
+
+  /* A section heading that reads as an eyebrow: still an h2 for the outline,
+     styled like the labels around it. */
+  .label--head { font-family: var(--f-util); font-weight: 500; line-height: 1.4; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.8rem 0 0; padding: 0; }
+  .chips li {
+    font-family: var(--f-util); font-size: var(--step--1);
+    border: 1px solid var(--line); border-radius: 999px; padding: 0.3em 0.8em; color: var(--ink-soft);
+  }
+
+  .cta {
+    display: inline-flex; align-items: center; margin-top: var(--sp-3);
+    padding: 0.85em 1.4em; border-radius: 999px; background: var(--poppy); color: var(--on-poppy);
+    font-family: var(--f-util); font-size: var(--step--1); letter-spacing: 0.06em;
+    text-transform: uppercase; text-decoration: none; will-change: transform;
+  }
+  .cta--dark { background: var(--ink); color: var(--paper); text-transform: none; letter-spacing: 0; }
+
+  /* Hero band — deliberately short so the work starts inside the first screen. */
+  .band { padding-block: var(--sp-5) var(--sp-4); }
+  .band__inner { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .band__id { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.2rem; }
+  .band :global(.band__name) {
+    font-size: var(--step-4);
+    font-variation-settings: "wght" 800, "wdth" 80;
+    line-height: 0.9;
+  }
+  .band__role { font-family: var(--f-util); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.12em; color: var(--poppy-ink); }
+  .band__line { font-size: var(--step-1); line-height: 1.4; max-width: 40ch; }
+  .band__facts {
+    display: grid; gap: var(--sp-3); margin: var(--sp-3) 0 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    border-top: 1px solid var(--line); padding-top: var(--sp-3); max-width: 820px;
+  }
+  .band__facts dd { margin: 0.2rem 0 0; font-family: var(--f-display); font-size: var(--step-1); font-variation-settings: "wght" 600, "wdth" 96; }
+
+  /* Feature */
+  .feature__eyebrow { color: var(--poppy); }
+  .feature__grid { display: grid; gap: var(--sp-4); margin-top: var(--sp-3); }
+  .feature__title { font-size: var(--step-4); font-variation-settings: "wght" 800, "wdth" 80; }
+  .feature__tagline { font-size: var(--step-1); color: var(--ink-soft); margin-top: var(--sp-2); max-width: 34ch; }
+  .feature__body { margin-top: var(--sp-3); max-width: 46ch; color: var(--ink-soft); }
+
+  /* Phone captures are portrait and detailed. On a phone, three of them side
+     by side would be 110px wide and unreadable, so they become a snapped
+     scroll row instead; the grid only kicks in when there is width for it. */
+  .feature__shots {
+    display: flex;
+    gap: 0.7rem;
+    margin: 0;
+    padding: 0 var(--gutter) 0.4rem 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .feature__shots::-webkit-scrollbar { display: none; }
+  .feature__shot { flex: 0 0 62%; scroll-snap-align: start; }
+  .feature__shot img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
+
+  @media (min-width: 700px) {
+    .feature__shots { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; padding: 0; align-items: start; }
+    .feature__shot { flex: none; }
+    .feature__shot--1 { transform: translateY(8%); }
+    .feature__shot--2 { transform: translateY(16%); }
+  }
+
+  @media (min-width: 900px) {
+    .feature__grid { grid-template-columns: 1fr 1fr; align-items: center; gap: var(--sp-6); }
+  }
+
+  /* Pair */
+  .pair { display: grid; gap: var(--sp-3); margin: var(--sp-3) 0 0; padding: 0; }
+  .pair__item a {
+    display: block; height: 100%; padding: var(--sp-3);
+    border: 1px solid var(--line); border-radius: 5px; background: var(--paper-2);
+    color: var(--ink); text-decoration: none; will-change: transform;
+    transition: border-color var(--dur-fast) ease;
+  }
+  .pair__item a:hover { border-color: var(--accent-ink, var(--poppy-ink)); }
+  .pair__n { color: var(--accent-ink, var(--poppy-ink)); }
+  .pair__draft { color: var(--ink-soft); }
+  .pair__title { font-size: var(--step-2); font-variation-settings: "wght" 700, "wdth" 88; margin-top: 0.2rem; }
+  .pair__tagline { color: var(--ink-soft); margin-top: 0.3rem; max-width: 34ch; }
+  [data-accent='cobalt'] { --accent-ink: var(--cobalt-ink); }
+  [data-accent='buttercup'] { --accent-ink: var(--butter-ink); }
+  @media (min-width: 760px) { .pair { grid-template-columns: 1fr 1fr; } }
+
+  /* About + skills */
+  .about { display: grid; gap: var(--sp-5); }
+  .about__plate {
+    display: grid; place-items: center; width: min(100%, 280px); aspect-ratio: 4 / 5;
+    border: 1px solid var(--line-strong); border-radius: 4px; background: var(--paper-2);
+    color: var(--poppy); font-family: var(--f-display); font-size: var(--step-4);
+    font-variation-settings: "wght" 800, "wdth" 78; margin: 0 0 0.6rem;
+  }
+  .about__right { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .prose p + p { margin-top: 1em; }
+  .skills { display: grid; gap: var(--sp-2); margin-top: var(--sp-3); border-top: 1px solid var(--line); padding-top: var(--sp-3); }
+  .skills__group { display: grid; gap: 0.2rem; }
+  .skills__title { font-size: var(--step-0); font-variation-settings: "wght" 700, "wdth" 92; }
+  .skills__items { font-family: var(--f-util); font-size: var(--step--1); color: var(--ink-soft); line-height: 1.8; }
+  @media (min-width: 900px) {
+    .about { grid-template-columns: 280px 1fr; gap: var(--sp-6); align-items: start; }
+    .skills { grid-template-columns: 1fr 1fr; gap: var(--sp-3) var(--sp-5); }
+  }
+
+  /* Playground grid */
+  .pens { display: grid; gap: var(--sp-3); margin: var(--sp-4) 0 0; padding: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+  .pens a {
+    display: block; height: 100%; padding: var(--sp-3); border: 1px solid var(--line);
+    border-radius: 5px; background: var(--paper-2); color: var(--ink); text-decoration: none;
+  }
+  .pens a:hover { border-color: var(--poppy); }
+  .pens__title { font-size: var(--step-1); font-variation-settings: "wght" 700, "wdth" 90; margin-top: 0.2rem; }
+  .pens__blurb { color: var(--ink-soft); margin-top: 0.3rem; }
+
+  /* Contact */
+  .contact__title { font-size: var(--step-4); font-variation-settings: "wght" 800, "wdth" 82; max-width: 18ch; margin-top: 0.3rem; }
+  .socials { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin: var(--sp-4) 0 0; padding: 0; }
+  .socials a { font-family: var(--f-util); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink); display: inline-flex; align-items: center; min-height: 44px; }
+</style>

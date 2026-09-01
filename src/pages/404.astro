@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import KineticType from '../components/KineticType.astro';
+---
+
+<Base title="Not found — Victor Buch" description="That page does not exist." ground="ink">
+  <section class="section lost" data-ground="ink" data-settle data-repel>
+    <div class="rail lost__inner">
+      <p class="label lost__code">404</p>
+      <KineticType as="h1" class="lost__type" lines={['NOT', 'HERE']} label="404 — page not found" />
+      <p class="lost__body">
+        That page does not exist. The work, on the other hand, does.
+      </p>
+      <a class="lost__link" href="/" data-target data-magnet="0.24">Back to the start</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost { min-height: 70svh; display: grid; align-items: center; }
+  .lost__inner { display: flex; flex-direction: column; gap: var(--sp-3); align-items: start; }
+  .lost__code { color: var(--poppy-ink); }
+
+  .lost :global(.lost__type) {
+    font-size: var(--step-5);
+    font-variation-settings: "wght" 800, "wdth" 80;
+  }
+
+  .lost :global(.lost__type .kinetic__line:nth-child(2) .kinetic__char) { color: var(--poppy); }
+
+  .lost__body { font-size: var(--step-1); max-width: 34ch; color: var(--ink-soft); }
+
+  .lost__link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--sp-3);
+    padding: 0.8em 1.4em;
+    border-radius: 999px;
+    background: var(--poppy);
+    color: var(--on-poppy);
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    will-change: transform;
+  }
+</style>

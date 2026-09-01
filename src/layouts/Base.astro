@@ -1,0 +1,94 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { site } from '../data/site';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Ground the page opens on, before any section takes over. */
+  ground?: 'paper' | 'ink' | 'buttercup';
+}
+
+const { title = site.meta.title, description = site.meta.description, ground = 'paper' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://victorbuch.com');
+---
+
+<!doctype html>
+<html lang="en" data-active-ground={ground}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#f5f3f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#110e19" media="(prefers-color-scheme: dark)" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Martian+Mono:wght@300..700&display=swap"
+    />
+
+    <ClientRouter />
+
+    <script is:inline>
+      // Applied before first paint so an explicit theme choice never flashes.
+      (() => {
+        const apply = () => {
+          try {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light' || saved === 'dark') {
+              document.documentElement.dataset.theme = saved;
+            }
+          } catch {
+            /* private mode: fall through to the system preference */
+          }
+        };
+        apply();
+        document.addEventListener('astro:after-swap', apply);
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import '../scripts/motion';
+      import { initMotion } from '../scripts/motion';
+      initMotion();
+    </script>
+
+    <style is:global>
+      /* The document ground follows the section in view so the overscroll
+         area never flashes a colour the page is not currently using. */
+      html {
+        background: var(--paper);
+        transition: background-color var(--dur-mid) ease;
+      }
+      html[data-active-ground='ink'] { background: var(--ground-ink-bg); }
+      html[data-active-ground='buttercup'] { background: var(--ground-butter-bg); }
+      main:focus { outline: none; }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,329 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+const { project, next } = Astro.props;
+const { Content } = await render(project);
+const d = project.data;
+
+/* Screenshots live at src/assets/work/<slug>/ and are optimised at build
+   time. A project without a folder simply renders no gallery. */
+const shots = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/work/**/*.{png,jpg,jpeg,webp}',
+  { eager: true },
+);
+const gallery = Object.entries(shots)
+  .filter(([path]) => path.includes(`/work/${project.id}/`))
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([path, mod]) => ({ path, src: mod.default }));
+
+const captions: Record<string, string> = {
+  '02-home-01-group-list': 'Group list — every shared ledger you belong to.',
+  '03-group-02-currency-dropdown': 'Group creation, with the currency the ledger settles in.',
+  '04-timeline-02-with-messages': 'The timeline: an expense and the conversation about it in one thread.',
+  '05-expense-02-create-filled': 'Adding an expense.',
+  '05-expense-06-custom-split-percentage': 'Custom split by percentage — the hard case, made ordinary.',
+  '06-overview-01-balances-tab': 'Balances: who receives, who pays, resolved to the fewest transfers.',
+  '06-overview-03-monthly-tab': 'Monthly view for recurring costs.',
+  '07-payments-01-settled': 'Settled.',
+};
+
+const captionFor = (path: string) => {
+  const name = path.split('/').pop()?.replace(/\.\w+$/, '') ?? '';
+  return captions[name] ?? name.replace(/^\d+-/, '').replace(/-/g, ' ');
+};
+---
+
+<Base title={`${d.title} — ${site.name}`} description={d.tagline} ground="paper">
+  <article class="case" data-accent={d.accent}>
+    <header class="section case__head" data-ground="paper" data-settle>
+      <div class="rail">
+        <p class="case__back"><a href="/#work" data-target>← Back to work</a></p>
+
+        <p class="label case__eyebrow">{d.year} · {d.role}</p>
+        <h1 class="case__title" style={`view-transition-name: project-${project.id}`}>{d.title}</h1>
+        <p class="case__tagline">{d.tagline}</p>
+
+        {
+          d.placeholder && (
+            <p class="case__flag" role="note">
+              Draft — this case study is placeholder copy waiting on your details.
+            </p>
+          )
+        }
+
+        <dl class="case__meta">
+          <div>
+            <dt class="label">Role</dt>
+            <dd>{d.role}</dd>
+          </div>
+          <div>
+            <dt class="label">Year</dt>
+            <dd>{d.year}</dd>
+          </div>
+          <div class="case__meta-wide">
+            <dt class="label">Stack</dt>
+            <dd>
+              <ul class="case__stack" role="list">
+                {d.stack.map((item) => <li>{item}</li>)}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+
+        {
+          (d.live || d.repo) && (
+            <p class="case__links">
+              {d.live && (
+                <a class="case__link" href={d.live} data-target data-magnet="0.2" rel="noopener">
+                  View it live ↗
+                </a>
+              )}
+              {d.repo && (
+                <a class="case__link case__link--ghost" href={d.repo} data-target data-magnet="0.2" rel="noopener">
+                  Source ↗
+                </a>
+              )}
+            </p>
+          )
+        }
+      </div>
+    </header>
+
+    <section class="section case__frame" data-ground="ink" aria-label="Problem and outcome">
+      <div class="rail case__pair" data-reveal-group>
+        <div data-reveal>
+          <h2 class="case__h2">The problem</h2>
+          <p class="case__body">{d.problem}</p>
+        </div>
+        <div data-reveal>
+          <h2 class="case__h2">Where it landed</h2>
+          <p class="case__body">{d.outcome}</p>
+        </div>
+      </div>
+    </section>
+
+    {
+      gallery.length > 0 && (
+        <section class="section case__gallery" data-ground="paper" aria-label={`${d.title} screenshots`}>
+          <div class="rail">
+            <h2 class="case__h2 case__gallery-title">The app</h2>
+            <p class="label case__gallery-note">
+              Captured from a debug build — the corner ribbon is Flutter's, not a design element.
+            </p>
+            <ul class="shots" role="list" data-reveal-group>
+              {gallery.map(({ path, src }, i) => (
+                <li class="shot" data-reveal>
+                  <figure>
+                    <Image
+                      src={src}
+                      alt={captionFor(path)}
+                      widths={[260, 380, 520]}
+                      sizes="(min-width: 1100px) 260px, (min-width: 700px) 32vw, 70vw"
+                      loading={i < 2 ? 'eager' : 'lazy'}
+                      class="shot__img"
+                    />
+                    <figcaption class="shot__caption">{captionFor(path)}</figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="section case__write" data-ground="paper">
+      <div class="rail prose case__prose"><Content /></div>
+    </section>
+
+    <nav class="section case__next" data-ground="buttercup" aria-label="Next project">
+      <div class="rail">
+        <p class="label">Next</p>
+        <a class="case__next-link" href={`/work/${next.id}/`} data-target data-magnet="0.14">
+          {next.data.title}<span aria-hidden="true">→</span>
+        </a>
+        <p class="case__next-tagline">{next.data.tagline}</p>
+      </div>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .case__head { padding-block: var(--sp-5) var(--sp-6); }
+
+  .case__back a {
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .case__eyebrow { color: var(--accent-ink, var(--poppy-ink)); margin-top: var(--sp-3); }
+
+  .case__title {
+    font-size: var(--step-5);
+    font-variation-settings: "wght" 800, "wdth" 80;
+    line-height: 0.86;
+    margin-top: var(--sp-2);
+  }
+
+  .case__tagline {
+    font-size: var(--step-1);
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 44ch;
+    margin-top: var(--sp-3);
+  }
+
+  .case__flag {
+    margin-top: var(--sp-3);
+    padding: 0.7rem 1rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: 4px;
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    max-width: 52ch;
+  }
+
+  .case__meta {
+    display: grid;
+    gap: var(--sp-3) var(--sp-5);
+    /* Role can be a long sentence; two generous columns beat six narrow ones. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    margin: var(--sp-5) 0 0;
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--line);
+  }
+
+  .case__meta dd {
+    margin: 0.25rem 0 0;
+    font-family: var(--f-display);
+    font-size: var(--step-1);
+    font-variation-settings: "wght" 600, "wdth" 96;
+  }
+
+  .case__meta-wide { grid-column: 1 / -1; }
+
+  .case__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.35rem 0 0;
+    padding: 0;
+  }
+
+  .case__stack li {
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.3em 0.8em;
+    color: var(--ink-soft);
+  }
+
+  .case__links { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: var(--sp-4); }
+
+  .case__link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8em 1.3em;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    will-change: transform;
+  }
+
+  .case__link--ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+  }
+
+  .case__h2 { font-size: var(--step-2); font-variation-settings: "wght" 700, "wdth" 90; }
+  .case__body { margin-top: var(--sp-2); color: var(--ink-soft); max-width: 46ch; }
+  .case__pair { display: grid; gap: var(--sp-5); }
+
+  @media (min-width: 800px) {
+    .case__pair { grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+  }
+
+  .case__gallery-note { margin-top: var(--sp-2); }
+
+  .shots {
+    display: grid;
+    gap: var(--sp-4);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+
+  .shot figure { margin: 0; display: grid; gap: 0.6rem; }
+
+  .shot__img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .shot__caption {
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .case__prose :global(h2) {
+    font-size: var(--step-2);
+    font-variation-settings: "wght" 700, "wdth" 90;
+    margin-top: var(--sp-5);
+  }
+
+  .case__prose :global(h2:first-child) { margin-top: 0; }
+  .case__prose :global(p) { margin-top: 1em; }
+  .case__prose :global(ol),
+  .case__prose :global(ul) { margin-top: 1em; padding-left: 1.3rem; display: grid; gap: 0.6rem; }
+  .case__prose :global(code) { font-family: var(--f-util); font-size: 0.9em; }
+  .case__prose :global(strong) { font-family: var(--f-display); font-weight: 700; }
+
+  .case__next-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: var(--sp-2);
+    font-family: var(--f-display);
+    font-size: var(--step-4);
+    font-variation-settings: "wght" 800, "wdth" 82;
+    color: var(--ink);
+    text-decoration: none;
+    will-change: transform;
+  }
+
+  .case__next-tagline { color: var(--ink-soft); max-width: 40ch; margin-top: var(--sp-2); }
+
+  [data-accent='poppy'] { --accent-ink: var(--poppy-ink); }
+  [data-accent='cobalt'] { --accent-ink: var(--cobalt-ink); }
+  [data-accent='buttercup'] { --accent-ink: var(--butter-ink); }
+</style>

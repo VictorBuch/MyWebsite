@@ -1,0 +1,129 @@
+---
+interface Entry {
+  title: string;
+  blurb: string;
+  tech: string;
+  href?: string;
+  placeholder: boolean;
+}
+
+interface Props {
+  entries: Entry[];
+}
+
+const { entries } = Astro.props;
+---
+
+<section class="section track" id="playground" data-ground="ink" data-track tabindex="-1">
+  <div class="track__frame">
+    <header class="rail sec-head" data-reveal-group>
+      <p class="label" data-reveal>Playground</p>
+      <h2 class="track__title" data-reveal>Ninety-nine days of one animation a day</h2>
+      <p class="lede" data-reveal>
+        Single-sitting experiments from the 100 Days CSS run. Most use no
+        JavaScript at all — the constraint is the point.
+      </p>
+    </header>
+
+    <ul class="track__lane" data-track-lane role="list">
+      {
+        entries.map((entry) => (
+          <li class="pen">
+            <a class="pen__link" href={entry.href} data-target data-magnet="0.1" rel="noopener">
+              <p class="pen__tech label">{entry.tech}</p>
+              <h3 class="pen__title">{entry.title}</h3>
+              <p class="pen__blurb">{entry.blurb}</p>
+              <p class="pen__cta" aria-hidden="true">Open on CodePen ↗</p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .track { overflow: hidden; }
+
+  .track__title {
+    font-size: var(--step-3);
+    font-variation-settings: "wght" 700, "wdth" 88;
+  }
+
+  .track__lane {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    width: var(--rail);
+    margin-inline: auto;
+  }
+
+  .pen { display: flex; }
+
+  .pen__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    padding: var(--sp-3);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--paper-2);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+    will-change: transform;
+  }
+
+  .pen__link:hover {
+    border-color: var(--poppy);
+    background: var(--paper-3);
+  }
+
+  .pen__tech { color: var(--poppy-ink); }
+
+  .pen__title {
+    font-size: var(--step-2);
+    font-variation-settings: "wght" 700, "wdth" 88;
+  }
+
+  .pen__blurb { color: var(--ink-soft); max-width: 40ch; }
+
+  .pen__cta {
+    margin-top: auto;
+    padding-top: var(--sp-2);
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cobalt);
+  }
+
+  /* Same rule as the timeline: no pinned scrub, no horizontal lane. */
+  @media (min-width: 900px) {
+    .track[data-track-active='true'] { min-height: 100svh; display: grid; align-content: center; }
+
+    .track[data-track-active='true'] .track__lane {
+      flex-direction: row;
+      gap: var(--sp-3);
+      width: max-content;
+      padding-inline: var(--gutter);
+      margin-inline: 0;
+      will-change: transform;
+    }
+
+    .track[data-track-active='true'] .pen { flex: 0 0 min(70vw, 330px); }
+    .track[data-track-active='true'] .pen__link { min-height: 260px; }
+  }
+
+  /* Still-page fallback: a plain responsive grid rather than one long column. */
+  @media (min-width: 760px) {
+    .track:not([data-track-active='true']) .track__lane {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    }
+  }
+</style>

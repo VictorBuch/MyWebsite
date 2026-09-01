@@ -1,0 +1,114 @@
+---
+import { site } from '../data/site';
+import ThemeToggle from './ThemeToggle.astro';
+
+const nav = [
+  { href: '/#work', label: 'Work' },
+  { href: '/#about', label: 'About' },
+  { href: '/#skills', label: 'Skills' },
+  { href: '/#experience', label: 'Experience' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<header class="masthead">
+  <div class="rail masthead__inner">
+    <a class="masthead__name" href="/" data-target aria-label={`${site.name} — home`}>
+      <span class="masthead__initials" aria-hidden="true">VB</span>
+      <span class="masthead__full">{site.name}</span>
+    </a>
+
+    <nav class="masthead__nav" aria-label="Sections">
+      <ul role="list">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} data-target>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in oklab, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    transition: background-color var(--dur-mid) ease, border-color var(--dur-mid) ease;
+  }
+
+  .masthead__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    justify-content: space-between;
+    padding-block: 0.6rem;
+    min-height: 56px;
+  }
+
+  .masthead__name {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-variation-settings: "wght" 800, "wdth" 84;
+    font-size: var(--step-1);
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .masthead__full { display: none; }
+
+  .masthead__nav ul {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .masthead__nav ul::-webkit-scrollbar { display: none; }
+
+  .masthead__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.7rem;
+    font-family: var(--f-util);
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-radius: 3px;
+    transition: color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+  }
+
+  .masthead__nav a:hover {
+    color: var(--ink);
+    background: var(--paper-2);
+  }
+
+  /* The theme control is the first thing to go on a narrow phone; the nav
+     itself stays, because it is the only way to reach a section directly. */
+  .masthead :global(.theme) { display: none; }
+
+  @media (min-width: 640px) {
+    .masthead__initials { display: none; }
+    .masthead__full { display: inline; }
+    .masthead :global(.theme) { display: inline-flex; }
+  }
+</style>

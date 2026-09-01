@@ -1,0 +1,59 @@
+---
+/**
+ * Splits a string into per-character spans for the Settle and Repel motions.
+ *
+ * Accessibility: the real string is rendered once as visually-hidden text and
+ * the glyph spans are hidden from assistive tech, so a screen reader hears
+ * words rather than a stream of letters. With JS disabled or motion reduced
+ * the glyphs are still plain text at full opacity.
+ */
+interface Props {
+  lines: string[];
+  /** Rendered element for the block. */
+  as?: 'h1' | 'h2' | 'p' | 'div';
+  /** Accessible name for the whole block. Defaults to the joined lines. */
+  label?: string;
+  class?: string;
+}
+
+const { lines, as: Tag = 'p', label, class: className = '' } = Astro.props as Props;
+const accessibleName = label ?? lines.join(' ');
+---
+
+<Tag class:list={['kinetic', className]}>
+  <span class="visually-hidden">{accessibleName}</span>
+  <span class="kinetic__glyphs" aria-hidden="true">
+    {
+      lines.map((line, i) => (
+        <span class="kinetic__line" data-line={i}>
+          {[...line].map((char) => (
+            <span class="kinetic__char">{char === ' ' ? '\u00a0' : char}</span>
+          ))}
+        </span>
+      ))
+    }
+  </span>
+</Tag>
+
+<style>
+  .kinetic {
+    font-family: var(--f-display);
+    line-height: 0.84;
+    letter-spacing: -0.035em;
+    margin: 0;
+    /* Characters translate on load and under the cursor; clipping them to the
+       block keeps the rise from bleeding into the section above. */
+    overflow: hidden;
+    padding-block: 0.06em;
+  }
+
+  .kinetic__line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .kinetic__char {
+    display: inline-block;
+    will-change: transform;
+  }
+</style>

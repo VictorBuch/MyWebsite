@@ -1,0 +1,184 @@
+/* ── Devětsil design tokens ─────────────────────────────────────────────
+   Light is the default ground. Dark is redefined twice: once for the
+   un-stamped system-preference state, once for an explicit data-theme
+   stamp, so a toggle wins in both directions.
+   ───────────────────────────────────────────────────────────────────── */
+:root {
+  --paper: #f5f3f7;
+  --paper-2: #ebe7f1;
+  --paper-3: #dfdae9;
+  --ink: #15111f;
+  --ink-soft: #4c4560;
+  --poppy: #e23a16;
+  --cobalt: #2438e8;
+  --buttercup: #ffc534;
+  --line: rgb(21 17 31 / 16%);
+  --line-strong: rgb(21 17 31 / 32%);
+  --on-poppy: #fff6f2;
+  --on-cobalt: #f2f3ff;
+  --on-butter: #231a00;
+  --on-ink: #f5f3f7;
+  /* Text-safe accent variants. Poppy and buttercup are display inks: at
+     body and label sizes they are only ever used through these. */
+  --poppy-ink: #c22f0f;
+  --butter-ink: #8a5a00;
+  --cobalt-ink: var(--cobalt);
+  --shadow: 0 1px 0 rgb(21 17 31 / 8%), 0 12px 32px -18px rgb(21 17 31 / 50%);
+  --selection-bg: var(--cobalt);
+  --selection-fg: var(--on-cobalt);
+
+  /* Type */
+  --f-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-util: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --step--1: clamp(0.76rem, 0.73rem + 0.15vw, 0.84rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.12rem);
+  --step-1: clamp(1.25rem, 1.16rem + 0.45vw, 1.55rem);
+  --step-2: clamp(1.6rem, 1.42rem + 0.9vw, 2.25rem);
+  --step-3: clamp(2.1rem, 1.7rem + 2vw, 3.4rem);
+  --step-4: clamp(2.8rem, 1.9rem + 4.4vw, 5.6rem);
+  --step-5: clamp(3.4rem, 1.4rem + 9vw, 9.5rem);
+
+  /* Space & layout */
+  --sp-1: 0.35rem;
+  --sp-2: 0.7rem;
+  --sp-3: 1.1rem;
+  --sp-4: clamp(1.4rem, 1rem + 1.6vw, 2.2rem);
+  --sp-5: clamp(2.2rem, 1.4rem + 3vw, 4rem);
+  --sp-6: clamp(3.5rem, 2rem + 7vw, 8rem);
+  --gutter: clamp(1.15rem, 4vw, 3.5rem);
+  --rail: min(1240px, 100% - var(--gutter) * 2);
+  --measure: 66ch;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --dur-fast: 180ms;
+  --dur-mid: 420ms;
+  --dur-slow: 720ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #110e19;
+    --paper-2: #1a1626;
+    --paper-3: #242032;
+    --ink: #f1eef7;
+    --ink-soft: #a9a1bc;
+    --poppy: #ff6a47;
+    --cobalt: #7c89ff;
+    --buttercup: #ffd166;
+    --line: rgb(241 238 247 / 18%);
+    --line-strong: rgb(241 238 247 / 36%);
+    --on-poppy: #1a0800;
+    --on-cobalt: #080b2a;
+    --on-butter: #231a00;
+    --on-ink: #f1eef7;
+    --poppy-ink: #ff6a47;
+    --butter-ink: #ffd166;
+    --cobalt-ink: var(--cobalt);
+    --shadow: 0 1px 0 rgb(0 0 0 / 50%), 0 16px 40px -20px #000;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #110e19;
+  --paper-2: #1a1626;
+  --paper-3: #242032;
+  --ink: #f1eef7;
+  --ink-soft: #a9a1bc;
+  --poppy: #ff6a47;
+  --cobalt: #7c89ff;
+  --buttercup: #ffd166;
+  --line: rgb(241 238 247 / 18%);
+  --line-strong: rgb(241 238 247 / 36%);
+  --on-poppy: #1a0800;
+  --on-cobalt: #080b2a;
+  --on-butter: #231a00;
+  --on-ink: #f1eef7;
+  --poppy-ink: #ff6a47;
+  --butter-ink: #ffd166;
+  --cobalt-ink: var(--cobalt);
+  --shadow: 0 1px 0 rgb(0 0 0 / 50%), 0 16px 40px -20px #000;
+}
+
+/* Ground background values, exposed so the document element can follow the
+   section in view. Redefined per theme below. */
+:root {
+  --ground-paper-bg: #f5f3f7;
+  --ground-ink-bg: #15111f;
+  --ground-butter-bg: #ffc534;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --ground-paper-bg: #110e19; --ground-ink-bg: #221c33; }
+}
+
+:root[data-theme="dark"] { --ground-paper-bg: #110e19; --ground-ink-bg: #221c33; }
+
+/* Grounds: sections swap their whole colour set rather than one property,
+   so nested text always resolves against the surface behind it. */
+[data-ground="ink"] {
+  --paper: #15111f;
+  --paper-2: #201a2d;
+  --paper-3: #2b2440;
+  --ink: #f5f3f7;
+  --ink-soft: #b3aac6;
+  --poppy: #ff6a47;
+  --cobalt: #8f9aff;
+  --poppy-ink: #ff7a5a;
+  --butter-ink: #ffd166;
+  --cobalt-ink: #9aa4ff;
+  --line: rgb(245 243 247 / 20%);
+  --line-strong: rgb(245 243 247 / 40%);
+}
+
+[data-ground="buttercup"] {
+  --paper: #ffc534;
+  --paper-2: #ffd464;
+  --paper-3: #f2b41c;
+  --ink: #231a00;
+  --ink-soft: #5a4406;
+  --poppy: #b32a06;
+  --cobalt: #17249c;
+  --poppy-ink: #8f1f03;
+  --butter-ink: #5a4406;
+  --cobalt-ink: #17249c;
+  --line: rgb(35 26 0 / 24%);
+  --line-strong: rgb(35 26 0 / 48%);
+}
+
+/* In dark mode the ink ground cannot be near-black — it would vanish into the
+   page. It becomes a lifted violet surface instead, keeping the ground swap
+   readable as a change of panel rather than a change of nothing. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-ground="ink"] {
+    --paper: #221c33;
+    --paper-2: #2c2540;
+    --paper-3: #372e4f;
+    --ink: #f5f3f7;
+    --ink-soft: #b8afcc;
+    --poppy: #ff7a5a;
+    --poppy-ink: #ff8a6c;
+    --cobalt: #9aa4ff;
+    --cobalt-ink: #a8b1ff;
+    --line: rgb(245 243 247 / 16%);
+    --line-strong: rgb(245 243 247 / 34%);
+  }
+}
+
+:root[data-theme="dark"] [data-ground="ink"] {
+  --paper: #221c33;
+  --paper-2: #2c2540;
+  --paper-3: #372e4f;
+  --ink: #f5f3f7;
+  --ink-soft: #b8afcc;
+  --poppy: #ff7a5a;
+  --poppy-ink: #ff8a6c;
+  --cobalt: #9aa4ff;
+  --cobalt-ink: #a8b1ff;
+  --line: rgb(245 243 247 / 16%);
+  --line-strong: rgb(245 243 247 / 34%);
+}
+

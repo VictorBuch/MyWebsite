@@ -1,9 +1,10 @@
 # Build the Astro site and deploy dist/ to GitHub Pages.
 name: Deploy Astro site to Pages
 
+# Deploys are manual while the redesign is in flight — a push to `main` must not
+# ship placeholder content to the live domain. Restore the `push` trigger at
+# cutover (wayfinder ticket #6).
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 permissions:
